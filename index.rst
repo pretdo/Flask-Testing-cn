@@ -187,11 +187,8 @@ Flask-Testing
 
 同样需要注意地是在这个例子中内存数据库 SQLite 是被使用：尽管它是十分的快，但是你要是使用其它类型的数据库(例如 MySQL 或者 PostgreSQL)，可能上述代码就不适用。
 
-你也可以
+你也可能想要在 ``setUp()`` 里为你的数据库增加一组实例一旦你的数据库的表已经创建。如果你想要使用数据集的话，请参看 `Fixture`_，它包含了对 SQLAlchemy 的支持。
 
-You may also want to add a set of instances for your database inside of a ``setUp()`` once your database
-tables have been created. If you want to work with larger sets of data, look at `Fixture`_ which includes
-support for SQLAlchemy.
 
 运行测试用例
 =============
@@ -199,13 +196,9 @@ support for SQLAlchemy.
 使用 unittest
 --------------
 
-For the beginning I go on the theory that you put all your tests into one file
-than you can use the :func:`unittest.main` function. This function will discover
-all your test methods in your :class:`TestCase` classes. Remember, the test
-methods and classes must starts with ``test`` (case-insensitive) that they will
-discover.
+一开始我建议把所有的测试放在一个文件里面，这样你可以使用 :func:`unittest.main` 函数。这个函数将会发现在你的 :class:`TestCase` 类里面的所有的测试方法。请记住，所有的测试方法和类请以 ``test`` 开头（不区分大小写），这样才能被自动识别出来。
 
-An example test file could look like this::
+一个测试用例的文件可以看起来像这样::
 
     import unittest
     import flask.ext.testing
@@ -215,12 +208,13 @@ An example test file could look like this::
     if __name__ == '__main__':
         unittest.main()
 
-Now you can run your tests with ``python tests.py``.
+现在你可以用 ``python tests.py`` 命令执行你的测试。
 
 使用 nose
 ---------
 
-The `nose`_ collector and test runner works also fine with Flask-Testing.
+同样 `nose`_ 也与 Flask-Testing 能够很好的融合在一起。
+
 
 更新历史
 ==========
