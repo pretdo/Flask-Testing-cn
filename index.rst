@@ -3,28 +3,27 @@ Flask-Testing
 
 .. module:: flask_testing
 
-The **Flask-Testing** extension provides unit testing utilities for Flask.
+**Flask-Testing** 扩展为 Flask 提供了单元测试的工具。
 
-Installing Flask-Testing
-========================
+安装 Flask-Testing
+======================
 
-Install with **pip** and **easy_install**::
+使用 **pip** 或者 **easy_install** 安装::
 
     pip install Flask-Testing
 
-or download the latest version from version control::
+或者从版本控制系统(github)中下载最新的版本::
 
     git clone https://github.com/jarus/flask-testing.git
     cd flask-testing
     python setup.py develop
 
-If you are using **virtualenv**, it is assumed that you are installing **Flask-Testing**
-in the same virtualenv as your Flask application(s).
+如果你正在使用 **virtualenv**，假设你会安装 **Flask-Testing** 在运行你的 Flask 应用程序的同一个 virtualenv 上。
 
-Writing tests
+编写测试用例
 =============
 
-Simply subclass the ``TestCase`` class::
+简单地继承 ``TestCase`` 的 MyTest::
 
     from flask.ext.testing import TestCase
 
@@ -32,8 +31,7 @@ Simply subclass the ``TestCase`` class::
 
         pass
 
-
-You must specify the ``create_app`` method, which should return a Flask instance::
+你必须定义 ``create_app`` 方法，该方法返回一个 Flask 实例::
 
     from flask import Flask
     from flask.ext.testing import TestCase
@@ -46,14 +44,13 @@ You must specify the ``create_app`` method, which should return a Flask instance
             app.config['TESTING'] = True
             return app
 
-If you don't define ``create_app`` a ``NotImplementedError`` will be raised.
+如果不定义 ``create_app``，``NotImplementedError`` 异常将会抛出。
 
 
-Testing with LiveServer
+使用 LiveServer 测试
 -----------------------
 
-If you want your tests done via Selenium or other headless browser like
-PhantomJS you can use the LiveServerTestCase::
+如果你想要你的测试通过 Selenium 或者 无头浏览器(无头浏览器的意思就是无外设的意思，可以在命令行下运行的浏览器)运行，你可以使用 LiveServerTestCase::
 
     import urllib2
     from flask import Flask
@@ -72,14 +69,13 @@ PhantomJS you can use the LiveServerTestCase::
             response = urllib2.urlopen(self.get_server_url())
             self.assertEqual(response.code, 200)
 
-The method ``get_server_url`` will return http://localhost:8943 in this case.
+在这个例子中 ``get_server_url`` 方法将会返回 http://localhost:8943。
 
 
-Testing JSON responses
+测试 JSON 响应
 ----------------------
 
-If you are testing a view that returns a JSON response, you can test the output using
-a special ``json`` attribute appended to the ``Response`` object::
+如果你正在测试一个返回 JSON 的视图函数的话，你可以使用 ``Response`` 对象的特殊的属性 ``json`` 来测试输出::
 
     @app.route("/ajax/")
     def some_json():
@@ -90,11 +86,10 @@ a special ``json`` attribute appended to the ``Response`` object::
             response = self.client.get("/ajax/")
             self.assertEquals(response.json, dict(success=True))
 
-Opt to not render the templates
+选择不渲染模板
 -------------------------------
 
-When testing with mocks the template rendering can be a problem. If you don't want to render
-the templates in the tests you can use the ``render_templates`` attribute::
+当测试需要处理模板渲染的时候可能是一个大问题。如果在测试中你不想要渲染模板的话可以设置 ``render_templates`` 属性::
 
     class TestNotRenderTemplates(TestCase):
 
@@ -105,8 +100,7 @@ the templates in the tests you can use the ``render_templates`` attribute::
 
             assert "" == response.data
 
-The signal will be sent anyway so that you can check if the template was rendered using
-the ``assert_template_used`` method::
+尽管可以设置不想渲染模板，但是渲染模板的信号在任何时候都会发送，你也可以使用 ``assert_template_used`` 方法来检查模板是否被渲染::
 
     class TestNotRenderTemplates(TestCase):
 
@@ -117,38 +111,32 @@ the ``assert_template_used`` method::
 
             self.assert_template_used('mytemplate.html')
 
-When the template rendering is turned off the tests will also run faster and the view logic
-can be tested in isolation.
+当渲染模板被关闭的时候，测试执行起来会更加的快速并且视图函数的逻辑将会孤立地被测试。
 
-Using with Twill
+使用 Twill
 ----------------
 
-`Twill`_ is a simple language for browsing the Web through
-a command line interface.
+`Twill`_ 是一个用来通过使用命令行界面浏览网页的简单的语言。
 
 .. note::
 
-   Please note that Twill only supports Python 2.x and therefore cannot be used with Python 3 or above.
+   请注意 Twill 只支持  Python 2.x，不能在 Python 3 或者以上版本上使用。
 
-``Flask-Testing`` comes with a helper class for creating functional tests using Twill::
+``Flask-Testing`` 拥有一个辅助类用来创建使用 Twill 的功能测试用例::
 
     def test_something_with_twill(self):
 
         with Twill(self.app, port=3000) as t:
             t.browser.go(t.url("/"))
 
+旧的 ``TwillTestCase`` 类已经被弃用。
 
-The older ``TwillTestCase`` has been deprecated.
+测试 SQLAlchemy
+------------------
 
-Testing with SQLAlchemy
------------------------
+这部分将会涉及使用 **Flask-Testing** 测试 `SQLAlchemy`_ 的一部分内容。这里假设你使用的是 `Flask-SQLAlchemy`_ 扩展，并且这里的例子也不是太难，可以适用于用户自己的配置。
 
-This covers a couple of points if you are using **Flask-Testing** with `SQLAlchemy`_. It is
-assumed that you are using the `Flask-SQLAlchemy`_ extension, but if not the examples should
-not be too difficult to adapt to your own particular setup.
-
-First, ensure you set the database URI to something other than your production database ! Second,
-it's usually a good idea to create and drop your tables with each test run, to ensure clean tests::
+首先，先确保数据库的 URI 是设置成开发环境而不是生产环境！其次，一个好的测试习惯就是在每一次测试执行的时候先创建表格，在结束的时候删除表格，这样保证干净的测试环境::
 
     from flask.ext.testing import TestCase
 
@@ -173,15 +161,11 @@ it's usually a good idea to create and drop your tables with each test run, to e
             db.session.remove()
             db.drop_all()
 
-Notice also that ``db.session.remove()`` is called at the end of each test, to ensure the SQLAlchemy
-session is properly removed and that a new session is started with each test run - this is a common
-"gotcha".
+同样需要注意地是每一个新的 SQLAlchemy 会话在测试用例运行的时候就被创建， ``db.session.remove()`` 在每一个测试用例的结尾被调用(这是为了确保 SQLAlchemy 会话及时被删除) - 这是一种常见的 “陷阱”。
 
-Another gotcha is that Flask-SQLAlchemy **also** removes the session instance at the end of every request (as
-should any thread safe application using SQLAlchemy with **scoped_session**). Therefore the session
-is cleared along with any objects added to it every time you call ``client.get()`` or another client method.
+另外一个 “陷阱” 就是 Flask-SQLAlchemy 会在每一个请求结束的时候删除 SQLAlchemy 会话(session)。因此每次调用 ``client.get()`` 或者其它客户端方法的后，SQLAlchemy 会话(session)连同添加到它的任何对象都会被删除。
 
-For example::
+例如::
 
     class SomeTest(MyTest):
 
@@ -199,21 +183,21 @@ For example::
             # this raises an AssertionError
             assert user in db.session
 
-You now have to re-add the "user" instance back to the session with ``db.session.add(user)``, if you are going
-to make any further database operations on it.
+你现在必须重新添加 "user" 实例回 SQLAlchemy 会话(session)使用 ``db.session.add(user)``，如果你想要在数据库上做进一步的操作。
 
-Also notice that for this example the SQLite in-memory database is used : while it is faster for tests,
-if you have database-specific code (e.g. for MySQL or PostgreSQL) it may not be applicable.
+同样需要注意地是在这个例子中内存数据库 SQLite 是被使用：尽管它是十分的快，但是你要是使用其它类型的数据库(例如 MySQL 或者 PostgreSQL)，可能上述代码就不适用。
+
+你也可以
 
 You may also want to add a set of instances for your database inside of a ``setUp()`` once your database
 tables have been created. If you want to work with larger sets of data, look at `Fixture`_ which includes
 support for SQLAlchemy.
 
-Running tests
+运行测试用例
 =============
 
-with unittest
--------------
+使用 unittest
+--------------
 
 For the beginning I go on the theory that you put all your tests into one file
 than you can use the :func:`unittest.main` function. This function will discover
@@ -233,13 +217,13 @@ An example test file could look like this::
 
 Now you can run your tests with ``python tests.py``.
 
-with nose
+使用 nose
 ---------
 
 The `nose`_ collector and test runner works also fine with Flask-Testing.
 
-Changes
-=======
+更新历史
+==========
 
 0.4.2 (24.07.2014)
 ------------------
